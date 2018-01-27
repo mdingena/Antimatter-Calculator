@@ -1,0 +1,73 @@
+body {
+    padding: 20px;
+}
+.squadron.header {
+    margin-top: 100px;
+    font-size: .8em;
+}
+.squadron span {
+    display: inline-block;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid transparent;
+    border-bottom: 0;
+    transform: rotate(-60deg);
+    transform-origin: 0 0;
+    white-space: nowrap;
+}
+.squadron input {
+    margin: 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+}
+.squadron:first-child input {
+    border-top: 1px solid;
+}
+.squadron input[type="number"] {
+    text-align: right;
+}
+.squadron .amount {
+    width: 60px;
+}
+.squadron input.amount {
+    border-left: 1px solid;
+}
+.squadron .type {
+    width: 100px;
+}
+.squadron input[type="radio"],
+.squadron .hullClass {
+    width: 20px;
+    border: 0;
+}
+.squadron .baseDamageExplosive,
+.squadron .baseDamageKinetic,
+.squadron .baseDamageThermal,
+.squadron .shieldExplosive,
+.squadron .shieldKinetic,
+.squadron .shieldThermal,
+.squadron .armorExplosive,
+.squadron .armorKinetic,
+.squadron .armorThermal {
+    width: 40px;
+}
+.squadron input.baseDamageExplosive,
+.squadron input.shieldExplosive,
+.squadron input.special {
+    border-left: 1px solid;
+}
+.squadron .efficiencyStrongVersus,
+.squadron .efficiencyWeakVersus,
+.squadron .efficiencyResilientVersus,
+.squadron .efficiencyVulnerableVersus {
+    width: 20px;
+    border: 0;
+}
+.squadron fieldset {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
