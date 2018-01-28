@@ -15,6 +15,11 @@ export default class extends Component {
         this.squadron.unit[ event.target.name ] = event.target.value;
         this.props.unitChanged( this.squadron );
     }
+
+    handleHullClassChange( event ) {
+        this.squadron.unit.hullClass = event.target.value;
+        this.props.unitChanged( this.squadron );
+    }
     
     _weapon( name ) {
         switch( name ) {
@@ -93,10 +98,10 @@ export default class extends Component {
 			<div className="squadron">
 				<input type="number"    name="amount" className="amount"        value={ this.squadron.amount }         onChange={ event => this.handleAmountChange( event ) } min={ 0 } />
                 <input type="text"      name="type"   className="type"          value={ this.squadron.unit.type }      onChange={ event => this.handleUnitChange( event ) } />
-                <fieldset                 id={ "hullClass-" + this.props.id }   value={ this.squadron.unit.hullClass } onChange={ event => this.handleUnitChange( event ) }>
-                    <input type="radio" name={ "hullClass-" + this.props.id }   value="frigate" defaultChecked={ this.squadron.unit.hullClass === 'frigate' } />
-                    <input type="radio" name={ "hullClass-" + this.props.id }   value="cruiser" defaultChecked={ this.squadron.unit.hullClass === 'cruiser' } />
-                    <input type="radio" name={ "hullClass-" + this.props.id }   value="capital" defaultChecked={ this.squadron.unit.hullClass === 'capital' } />
+                <fieldset                 id={ "hullClass-" + this.props.id }>
+                    <input type="radio" name={ "hullClass-" + this.props.id }   value="frigate" defaultChecked={ this.squadron.unit.hullClass === 'frigate' } onChange={ event => this.handleHullClassChange( event ) }/>
+                    <input type="radio" name={ "hullClass-" + this.props.id }   value="cruiser" defaultChecked={ this.squadron.unit.hullClass === 'cruiser' } onChange={ event => this.handleHullClassChange( event ) }/>
+                    <input type="radio" name={ "hullClass-" + this.props.id }   value="capital" defaultChecked={ this.squadron.unit.hullClass === 'capital' } onChange={ event => this.handleHullClassChange( event ) }/>
                 </fieldset>
                 <input type="number"   name="baseDamageExplosive"               className="baseDamageExplosive"        value={ this.squadron.unit.weapon.explosive }                                           onChange={ event => this.handleWeaponChange( event) }     min={ 0 } />
                 <input type="number"   name="baseDamageKinetic"                 className="baseDamageKinetic"          value={ this.squadron.unit.weapon.kinetic }                                             onChange={ event => this.handleWeaponChange( event) }     min={ 0 } />

@@ -34,14 +34,14 @@ class Fleet {
 
     _advantage( offence, defence ) {
         let advantage = 1.0;
-        if( offence.unit.efficiency.weak.versus.indexOf( defence.unit.hullType ) !== -1 ) {
+        if( offence.unit.efficiency.weak.versus.indexOf( defence.unit.hullClass ) !== -1 ) {
             advantage *= offence.unit.efficiency.weak.bonus;
-        } else if( offence.unit.efficiency.strong.versus.indexOf( defence.unit.hullType ) !== -1 ) {
+        } else if( offence.unit.efficiency.strong.versus.indexOf( defence.unit.hullClass ) !== -1 ) {
             advantage *= offence.unit.efficiency.strong.bonus;
         }
-        if( defence.unit.efficiency.vulnerable.versus.indexOf( offence.unit.hullType ) !== -1 ) {
+        if( defence.unit.efficiency.vulnerable.versus.indexOf( offence.unit.hullClass ) !== -1 ) {
             advantage *= defence.unit.efficiency.vulnerable.bonus;
-        } else if( defence.unit.efficiency.resilient.versus.indexOf( offence.unit.hullType ) !== -1 ) {
+        } else if( defence.unit.efficiency.resilient.versus.indexOf( offence.unit.hullClass ) !== -1 ) {
             advantage *= defence.unit.efficiency.resilient.bonus;
         }
         return advantage;
@@ -117,6 +117,7 @@ export default class extends Component {
     handleFleetChange( side, index, state ) {
         let fleet = this.state[ side ];
         fleet[ index ] = state;
+        console.log( state );
         this.setState({
             [ side ] : fleet
         });
