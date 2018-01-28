@@ -1,5 +1,9 @@
 body {
     padding: 20px;
+    text-align: center;
+}
+.app {
+    margin: 0 auto;
 }
 .squadron.header {
     margin-top: 100px;
@@ -14,6 +18,7 @@ body {
     transform: rotate(-60deg);
     transform-origin: 0 0;
     white-space: nowrap;
+    text-align: initial;
 }
 .squadron input {
     margin: 0;
@@ -53,6 +58,9 @@ body {
 .squadron .armorThermal {
     width: 40px;
 }
+.squadron .special {
+    width: 150px;
+}
 .squadron input.baseDamageExplosive,
 .squadron input.shieldExplosive,
 .squadron input.special {
@@ -70,4 +78,33 @@ body {
     margin: 0;
     padding: 0;
     border: 0;
+}
+
+.score {
+    margin-top: 15px;
+}
+.score .offence,
+.losses .offence {
+    color: rgb(204, 14, 0);
+}
+.score .defence,
+.losses .defence {
+    color: rgb(0, 48, 204);
+}
+.score #tactic {
+    margin-right: 20px;
+}
+
+.offence .squadron * {
+    border-color: rgb(204, 14, 0) !important;
+}
+.defence .squadron * {
+    border-color: rgb(0, 48, 204) !important;
+}
+
+.losses ul {
+    display: inline-block;
+    list-style: none;
+    text-align: left;
+    vertical-align: top;
 }

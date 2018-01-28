@@ -1,222 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
+import { offence as attackers, defence as defenders } from './fleetSetup';
 import Squadron from './Squadron';
 
-let attackers = [
-    {
-        amount : 40,
-        unit : {
-            type : 'assaultFrigate',
-            hullClass : 'frigate',
-            weapon : {
-                explosive : 3,
-                kinetic : 1,
-                thermal : 0
-            },
-            shield : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            armor : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            efficiency : {
-                strong     : {
-                    versus : [ 'cruiser', 'capital' ],
-                    bonus  : 1.1
-                },
-                weak       : {
-                    versus : [],
-                    bonus  : 0.75
-                },
-                resilient  : {
-                    versus : [ 'capital' ],
-                    bonus  : 1.1
-                },
-                vulnerable : {
-                    versus : [],
-                    bonus  : 0.75
-                }
-            },
-            special : ""
-        }
-    },
-    {
-        amount : 20,
-        unit : {
-            type : 'destroyer',
-            hullClass : 'cruiser',
-            weapon : {
-                explosive : 15,
-                kinetic : 5,
-                thermal : 0
-            },
-            shield : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            armor : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            efficiency : {
-                strong : {
-                    versus : [ 'frigate' ],
-                    bonus  : 1.1
-                },
-                weak : {
-                    versus : [ 'capital' ],
-                    bonus  : 0.75
-                },
-                resilient  : {
-                    versus : [],
-                    bonus  : 1.1
-                },
-                vulnerable : {
-                    versus : [ 'cruiser' ],
-                    bonus  : 0.75
-                }
-            },
-            special : ""
-        }
-    },
-    {
-        amount : 5,
-        unit : {
-            type : 'dreadnought',
-            hullClass : 'capital',
-            weapon : {
-                explosive : 45,
-                kinetic   : 15,
-                thermal   : 0
-            },
-            shield : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            armor : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            efficiency : {
-                strong : {
-                    versus : [ 'capital' ],
-                    bonus  : 1.1
-                },
-                weak : {
-                    versus : [],
-                    bonus  : 0.75
-                },
-                resilient : {
-                    versus : [ 'frigate', 'cruiser' ],
-                    bonus  : 1.1
-                },
-                vulnerable : {
-                    versus : [],
-                    bonus  : 0.9
-                }
-            },
-            special : ""
-        }
-    }
-];
-
-let defenders = [
-    {
-        amount : 60,
-        unit : {
-            type : 'interceptor',
-            hullClass : 'frigate',
-            weapon : {
-                explosive : 0,
-                kinetic : 3,
-                thermal : 1
-            },
-            shield : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            armor : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            efficiency : {
-                strong     : {
-                    versus : [ 'frigate' ],
-                    bonus  : 1.1
-                },
-                weak       : {
-                    versus : [],
-                    bonus  : 0.75
-                },
-                resilient  : {
-                    versus : [ 'cruiser', 'capital' ],
-                    bonus  : 1.1
-                },
-                vulnerable : {
-                    versus : [],
-                    bonus  : 0.75
-                }
-            },
-            special : ""
-        }
-    },
-    {
-        amount : 35,
-        unit : {
-            type : 'interdictor',
-            hullClass : 'cruiser',
-            weapon : {
-                explosive : 0,
-                kinetic : 15,
-                thermal : 5
-            },
-            shield : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            armor : {
-                explosive : 1.0,
-                kinetic   : 1.0,
-                thermal   : 1.0
-            },
-            efficiency : {
-                strong : {
-                    versus : [ 'cruiser', 'capital' ],
-                    bonus  : 1.1
-                },
-                weak : {
-                    versus : [ 'frigate' ],
-                    bonus  : 0.75
-                },
-                resilient  : {
-                    versus : [ 'cruiser', 'capital' ],
-                    bonus  : 1.1
-                },
-                vulnerable : {
-                    versus : [],
-                    bonus  : 0.75
-                }
-            },
-            special : ""
-        }
-    }
-];
 
 class Fleet {
     constructor( commander, fleet ) {
         this.commander = commander;
         this.fleet     = fleet;
+        this.remaining = JSON.parse( JSON.stringify( fleet ) );
+        this.losses    = JSON.parse( JSON.stringify( fleet ) );
     }
 
     attack( opponent ) {
@@ -255,13 +48,18 @@ class Fleet {
     }
 
     destroy( tactic, ratio, isVictor ) {
+        ratio = Math.pow( ratio, 1.5 );
         if( tactic === 'raid' ) {
-            ratio = isVictor ? ratio : 1.0 - ratio;
+            ratio = ratio / ( 1.0 + ratio );
+            if( !isVictor ) {
+                ratio = 1.0 - ratio;
+            }
         } else if( !isVictor ) {
             ratio = 1.0;
         }
-        this.fleet.forEach( ( squadron, i, fleet ) => {
-            fleet[ i ].amount = Math.round( squadron.amount * ( 1.0 - ratio ) );
+        this.fleet.forEach( ( squadron, i ) => {
+            this.remaining[ i ].amount = Math.round( squadron.amount * ( 1.0 - ratio ) );
+            this.losses[ i ].amount = Math.round( squadron.amount * ratio );
         });
     }
 }
@@ -269,8 +67,7 @@ class Fleet {
 class Battle {
     constructor( offence, tactic, defence ) {
         this.conclusion = this._resolveCombat( offence, defence );
-        this.conclusion.winner.destroy( tactic, this.conclusion.ratio, true );
-        this.conclusion.loser.destroy( tactic, this.conclusion.ratio, false );
+        this.aftermath = this._destroyUnits( tactic );
     }
 
     _resolveCombat( offence, defence ) {
@@ -280,15 +77,19 @@ class Battle {
         const defendDamage = this._damage( defendPoints );
         if( attackDamage > defendDamage ) {
             return {
-                winner : offence,
-                loser  : defence,
-                ratio  : defendDamage / attackDamage
+                offence : attackPoints,
+                defence : defendPoints,
+                victor  : offence,
+                loser   : defence,
+                ratio   : defendDamage / attackDamage
             }
         } else {
             return {
-                winner : defence,
-                loser  : offence,
-                ratio  : attackDamage / defendDamage
+                offence : attackPoints,
+                defence : defendPoints,
+                victor  : defence,
+                loser   : offence,
+                ratio   : attackDamage / defendDamage
             }
         }
     }
@@ -296,22 +97,34 @@ class Battle {
     _damage( points ) {
         return Object.keys( points ).reduce( ( prev, damageType ) => prev += points[ damageType ], 0 );
     }
+
+    _destroyUnits( tactic ) {
+        this.conclusion.victor.destroy( tactic, this.conclusion.ratio, true );
+        this.conclusion.loser.destroy( tactic, this.conclusion.ratio, false );
+    }
 }
 
 export default class extends Component {
     constructor( props ) {
         super( props );
-
+        this.state = {
+            attackers : attackers,
+            defenders : defenders,
+            tactic    : 'invade'
+        }
     }
 
-    handleFleetChange
-
-    handleInputChange( event ) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
+    handleFleetChange( side, index, state ) {
+        let fleet = this.state[ side ];
+        fleet[ index ] = state;
         this.setState({
-            [ name ] : value
+            [ side ] : fleet
+        });
+    }
+
+    handleTacticChange( event ) {
+        this.setState({
+            tactic : event.target.checked ? 'raid' : 'invade'
         });
     }
     
@@ -323,11 +136,17 @@ export default class extends Component {
     input efficiencyVulnerableBonus
     */
     render() {
-        /*let attacker = new Fleet( 'attacker', attackers );
-        let defender = new Fleet( 'defender', defenders );
-        const attackPoints = attacker.attack( defender );
-        const defendPoints = defender.attack( attacker );
-        let battle = new Battle( attacker, 'raid', defender );*/
+        const attacker = new Fleet( 'attacker', this.state.attackers );
+        const defender = new Fleet( 'defender', this.state.defenders );
+        const battle = new Battle( attacker, this.state.tactic, defender );
+        let losses = {};
+        if( this.state.tactic === 'raid' ) {
+            losses[ battle.conclusion.victor.commander ] = Math.pow( battle.conclusion.ratio, 1.5 ) / ( 1.0 + Math.pow( battle.conclusion.ratio, 1.5 ) );
+            losses[ battle.conclusion.loser.commander ]  = 1.0 - losses[ battle.conclusion.victor.commander ];
+        } else {
+            losses[ battle.conclusion.victor.commander ] = Math.pow( battle.conclusion.ratio, 1.5 );
+            losses[ battle.conclusion.loser.commander ]  = 1.0;
+        }
         return(
             <div className="app">
                 <div className="squadron header">
@@ -343,8 +162,8 @@ export default class extends Component {
                     <span className="efficiencyStrongVersus">Strong vs. Cruisers</span>
                     <span className="efficiencyStrongVersus">Strong vs. Capitals</span>
                     <span className="efficiencyWeakVersus">Weak vs. Frigates</span>
-                    <span className="efficiencyWeakVersus">Weak vs. Frigates</span>
-                    <span className="efficiencyWeakVersus">Weak vs. Frigates</span>
+                    <span className="efficiencyWeakVersus">Weak vs. Cruisers</span>
+                    <span className="efficiencyWeakVersus">Weak vs. Capitals</span>
                     <span className="shieldExplosive">% Explosive Shield</span>
                     <span className="shieldKinetic">% Kinetic Shield</span>
                     <span className="shieldThermal">% Thermal Shield</span>
@@ -352,24 +171,48 @@ export default class extends Component {
                     <span className="armorKinetic">% Kinetic Armor</span>
                     <span className="armorThermal">% Thermal Armor</span>
                     <span className="efficiencyResilientVersus">Resilient vs. Frigates</span>
-                    <span className="efficiencyResilientVersus">Resilient vs. Frigates</span>
-                    <span className="efficiencyResilientVersus">Resilient vs. Frigates</span>
+                    <span className="efficiencyResilientVersus">Resilient vs. Cruisers</span>
+                    <span className="efficiencyResilientVersus">Resilient vs. Capitals</span>
                     <span className="efficiencyVulnerableVersus">Vulnerable vs. Frigates</span>
-                    <span className="efficiencyVulnerableVersus">Vulnerable vs. Frigates</span>
-                    <span className="efficiencyVulnerableVersus">Vulnerable vs. Frigates</span>
+                    <span className="efficiencyVulnerableVersus">Vulnerable vs. Cruisers</span>
+                    <span className="efficiencyVulnerableVersus">Vulnerable vs. Capitals</span>
                     <span className="special">Special</span>
                 </div>
-                <div id="attackers">{
-                    attackers.map( ( squadron, i ) => {
-                        return <Squadron key={ i } amount={ squadron.amount } unit={ squadron.unit } />;
+                <div id="attackers" className="offence">{
+                    attacker.fleet.map( ( squadron, i ) => {
+                        return <Squadron key={ i } id={ attacker.commander + "-" + i } amount={ squadron.amount } unit={ squadron.unit } unitChanged={ state => this.handleFleetChange( 'attackers', i, state ) } />;
                     })
                 }</div>
                 <br />
-                <div id="defenders">{
-                    defenders.map( ( squadron, i ) => {
-                        return <Squadron key={ i } amount={ squadron.amount } unit={ squadron.unit } />;
+                <div id="defenders" className="defence">{
+                    defender.fleet.map( ( squadron, i ) => {
+                        return <Squadron key={ i } id={ defender.commander + "-" + i } amount={ squadron.amount } unit={ squadron.unit } unitChanged={ state => this.handleFleetChange( 'defenders', i, state ) } />;
                     })
                 }</div>
+                <div className="score">
+                    <label>Raid <input id="tactic" type="checkbox" onChange={ event => this.handleTacticChange( event ) } /></label>
+                    <big className="offence"><strong>{ Math.round( Object.keys( battle.conclusion.offence ).reduce( ( prev, damageType ) => prev += battle.conclusion.offence[ damageType ], 0 ) ) }</strong></big>
+                    &nbsp;vs.&nbsp;
+                    <big className="defence"><strong>{ Math.round( Object.keys( battle.conclusion.defence ).reduce( ( prev, damageType ) => prev += battle.conclusion.defence[ damageType ], 0 ) ) }</strong></big>
+                    &nbsp;<small className={ battle.conclusion.loser.commander === 'attacker' ? "offence" : "defence" }>({ ( battle.conclusion.ratio * 100 ).toFixed( 3 ) }%)</small>
+                </div>
+                < hr />
+                <div className="losses">
+                    <ul className="offence">
+                        <li><strong>{ ( losses.attacker * 100 ).toFixed( 2 ) }% lost</strong></li>
+                    {
+                        attacker.losses.map( ( squadron, i ) => {
+                            return squadron.amount > 0 ? <li key={ i } amount={ squadron.amount } unit={ squadron.unit }>{ squadron.amount } { squadron.unit.type + ( squadron.amount > 1 ? "s" : "" ) }</li> : null;
+                        })
+                    }</ul>
+                    <ul className="defence">
+                        <li><strong>{ ( losses.defender * 100 ).toFixed( 2 ) }% lost</strong></li>
+                    {
+                        defender.losses.map( ( squadron, i ) => {
+                            return squadron.amount > 0 ? <li key={ i } amount={ squadron.amount } unit={ squadron.unit }>{ squadron.amount } { squadron.unit.type + ( squadron.amount > 1 ? "s" : "" ) }</li> : null;
+                        })
+                    }</ul>
+                </div>
             </div>
         );
     }
